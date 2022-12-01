@@ -1893,7 +1893,7 @@ void loop() {
   //Print data at 100hz (uncomment one at a time for troubleshooting) - SELECT ONE:
   //printRadioData(current_time, print_counter, channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm, channel_5_pwm, channel_6_pwm);     //Prints radio pwm values (expected: 1000 to 2000)
   //printDesiredState(current_time, print_counter, regVARS.nml_des_state.thro_des, regVARS.nml_des_state.roll_des, regVARS.nml_des_state.pitch_des, regVARS.nml_des_state.yaw_des);  //Prints desired vehicle state commanded in either degrees or deg/sec (expected: +/- maxAXIS for roll, pitch, yaw; 0 to 1 for throttle)
-  printGyroData(current_time, print_counter, regVARS.IMU.GyroX, regVARS.IMU.GyroY, regVARS.IMU.GyroZ);      //Prints filtered gyro data direct from IMU (expected: ~ -250 to 250, 0 at rest)
+  //printGyroData(current_time, print_counter, regVARS.IMU.GyroX, regVARS.IMU.GyroY, regVARS.IMU.GyroZ);      //Prints filtered gyro data direct from IMU (expected: ~ -250 to 250, 0 at rest)
   //printAccelData(current_time, print_counter, regVARS.IMU.AccX, regVARS.IMU.AccY, regVARS.IMU.AccZ);     //Prints filtered accelerometer data direct from IMU (expected: ~ -2 to 2; x,y 0 when level, z 1 when level)
   //printMagData(current_time, print_counter, regVARS.IMU.MagX, regVARS.IMU.MagY, regVARS.IMU.MagZ);       //Prints filtered magnetometer data direct from IMU (expected: ~ -300 to 300)
   //printRollPitchYaw(current_time, print_counter, regVARS.IMU.roll_IMU, regVARS.IMU.pitch_IMU, regVARS.IMU.yaw_IMU);  //Prints roll, pitch, and yaw angles in degrees from imuf.Madgwick filter (expected: degrees, 0 when level)
