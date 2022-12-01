@@ -5,8 +5,7 @@ $pio_env2 = "t41"
 function clean_workspace {
     $junk = @(
         ".\.pio\"
-        ".\.vscode\" 
-        ".\.gitignore"
+        ".\.vscode\"
     )
 
     foreach($item in $junk) {
@@ -47,5 +46,5 @@ function init {
     }
 }
 
-clean_workspace
+#clean_workspace
 init

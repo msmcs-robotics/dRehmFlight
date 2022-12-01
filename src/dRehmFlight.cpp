@@ -8,9 +8,10 @@
 
 //Uncomment only one receiver type
 //#define USE_PWM_RX
-#define USE_PPM_RX
+//#define USE_PPM_RX
 //#define USE_SBUS_RX
 //#define USE_DSM_RX
+#define headless
 
 static const int num_DSM_channels = 6; //If using DSM RX, change this to match the number of transmitter channels you have
 
@@ -127,7 +128,9 @@ const int ch6Pin = 22; //aux1 (free aux channel)
 const int PPM_Pin = 23;
 
 struct {
-  
+    // Indicator Lights
+    const int mainLEDpin = 13;
+
     //OneShot125 ESC pin outputs:
     const int m1Pin = 0;
     const int m2Pin = 1;
@@ -194,7 +197,7 @@ struct {
     // Servos
     const int min_PWM = 900;
     const int max_PWM = 2100;
-    const float half_speed = max_PWM - (max_PWM - min_PWM)/2;
+    const float hover_speed = max_PWM - (max_PWM - min_PWM)/2;
 
     // Ultrasonic sensors
 
@@ -277,6 +280,9 @@ struct {
 } usrVARS;
 
 struct {
+  
+  const int loopRate = 2000; //Do not exceed 2000Hz, all filter parameters tuned to 2000Hz by default
+
   //IMU:
 
   struct {
@@ -1537,23 +1543,8 @@ class MiscFuncs {
 };
 
 //========================================================================================================================//
-//                                               Headless Classes                                                              //
+//                                               Headless Classes                                                         //
 //========================================================================================================================//
-class Headless_Misc {
-    public:
-
-        void failsafe() {
-            // Stop Motors
-        }
-
-        float scaleCommands (int direction, float multiplier) {
-        // Scale Values from 0 to 1 to 0 to 255
-
-        float speed;
-        return speed;
-}
-};
-
 class Headless_Sentry {
     
     // sec1 is the front sector
@@ -1719,61 +1710,92 @@ class Headless_Sentry {
         }
 };
 
-class Headless_Pre_Defined_Moves {
+class Headless_Actions {
+    // emulate radio commands based on sensor input
+    // research what channel values should be based on moving radio joysticks.
     public:
-        // This might change after trial and error, but...
 
-        //servo1 is front right
-        //servo2 is back right
-        //servo3 is back left
-        //servo4 is front left
-
-        //spin specified motors 10% faster to move in a direction
+        //spin motors 10% faster to move in a specified direction
         float movement_multiplier = 1.1;
+
+        // placeholders for sending PWM vals to motors
+        int motor1;
+        int motor2;
+        int motor3;
+        int motor4;
+
+        // local placeholders for channel vals 
+        int l_ch1;
+        int l_ch2;
+        int l_ch3;
+        int l_ch4;
+        int l_ch5;
+        int l_ch6;
+
         
-        void forward(float speed) {
-            // move forward
-            // back motors spin faster
-            servo1.write(speed);
-            servo2.write(speed * movement_multiplier);
-            servo3.write(speed * movement_multiplier);
-            servo4.write(speed);
+        int forward(int speed, int f_speed) {
+          // move forward
+          // make back motors spin faster
+          return l_ch1, l_ch2, l_ch3, l_ch4, l_ch5, l_ch6;
         }
 
-        void backward(float speed) {
-            // move backward
-            // front motors spin faster
-            servo1.write(speed * movement_multiplier);
-            servo2.write(speed);
-            servo3.write(speed);
-            servo4.write(speed * movement_multiplier);
+        int backward(int speed, int f_speed) {
+          // move backward
+          // make front motors spin faster
+          return l_ch1, l_ch2, l_ch3, l_ch4, l_ch5, l_ch6;
         }
 
-        void left(float speed) {
-            // move left
-            // right motors spin faster
-            servo1.write(speed * movement_multiplier);
-            servo2.write(speed * movement_multiplier);
-            servo3.write(speed);
-            servo4.write(speed);
+        int left(int speed, int f_speed) {
+          // move left
+          // make right motors spin faster
+          return l_ch1, l_ch2, l_ch3, l_ch4, l_ch5, l_ch6;
         }
 
-        void right(float speed) {
+        int right(int speed, int f_speed) {
             // move right
-            // left motors spin faster
-            servo1.write(speed);
-            servo2.write(speed);
-            servo3.write(speed * movement_multiplier);
-            servo4.write(speed * movement_multiplier);
+            // make left motors spin faster
+            return l_ch1, l_ch2, l_ch3, l_ch4, l_ch5, l_ch6;
         }
 
-        void hover() {
+        int hover(int speed, int f_speed) {
             // hover
-            // write half PWM speed
-            servo1.write(module_info.half_speed);
-            servo2.write(module_info.half_speed);
-            servo3.write(module_info.half_speed);
-            servo4.write(module_info.half_speed);
+            // make write half PWM speed
+            return l_ch1, l_ch2, l_ch3, l_ch4, l_ch5, l_ch6;
+        }
+
+        int handle_input(float f, float b, float l, float r, float h) {
+  
+          int speed;
+          int multi;
+
+          // if f > b
+          // if l > r
+          // if h > some threshold
+
+          // action(speed, f_speed())
+
+        }
+
+        void getCommands() {
+          // get input from specified pins
+          int x = 0;
+          channel_1_pwm = x;
+          channel_2_pwm = x;
+          channel_3_pwm = x;
+          channel_4_pwm = x;
+          channel_5_pwm = x;
+          channel_6_pwm = x;
+          
+          //Low-pass the critical commands and update previous values
+          float b = 0.7; //Lower=slower, higher=noiser
+          channel_1_pwm = (1.0 - b)*channel_1_pwm_prev + b*channel_1_pwm;
+          channel_2_pwm = (1.0 - b)*channel_2_pwm_prev + b*channel_2_pwm;
+          channel_3_pwm = (1.0 - b)*channel_3_pwm_prev + b*channel_3_pwm;
+          channel_4_pwm = (1.0 - b)*channel_4_pwm_prev + b*channel_4_pwm;
+          channel_1_pwm_prev = channel_1_pwm;
+          channel_2_pwm_prev = channel_2_pwm;
+          channel_3_pwm_prev = channel_3_pwm;
+          channel_4_pwm_prev = channel_4_pwm;
         }
 };
 
@@ -1787,10 +1809,11 @@ void setup() {
   MotorFuncs motorfuncs;
 
   Serial.begin(usrVARS.baud); //USB serial
+
   delay(500);
   
   //Initialize all pins
-  pinMode(13, OUTPUT); //Pin 13 LED blinker on board, do not modify 
+  pinMode(pinout.mainLEDpin, OUTPUT); //Pin 13 LED blinker on board, do not modify 
   pinMode(pinout.m1Pin, OUTPUT);
   pinMode(pinout.m2Pin, OUTPUT);
   pinMode(pinout.m3Pin, OUTPUT);
@@ -1814,7 +1837,7 @@ void setup() {
   us_s4.attach(pinout.us_s4);
 
   //Set built in LED to turn on to signal startup
-  digitalWrite(13, HIGH);
+  digitalWrite(pinout.mainLEDpin, HIGH);
 
   delay(5);
 
@@ -1879,9 +1902,8 @@ void loop() {
   ReadRadio readradio;
   MotorFuncs motorfuncs;
 
-  Headless_Misc hm;
   Headless_Sentry hs;
-  Headless_Pre_Defined_Moves hpd;
+  Headless_Actions hpd;
   
   //Keep track of what time it is and how much time has elapsed since the last loop
   prev_time = current_time;      
@@ -1930,11 +1952,16 @@ void loop() {
   servo5.write(regVARS.mixer.s5_command_PWM);
   servo6.write(regVARS.mixer.s6_command_PWM);
   servo7.write(regVARS.mixer.s7_command_PWM);
-    
+  
   //Get vehicle commands for next loop iteration
-  readradio.getCommands(); //Pulls current available radio commands
+  #ifdef headless
+    hpd.getCommands();
+  #else
+    readradio.getCommands(); //Pulls current available radio commands
+  #endif
+
   readradio.failSafe(); //Prevent failures in event of bad receiver connection, defaults to failsafe values assigned in setup
 
   //Regulate loop rate
-  setup.loopRate(2000); //Do not exceed 2000Hz, all filter parameters tuned to 2000Hz by default
+  setup.loopRate(regVARS.loopRate); //Do not exceed 2000Hz, all filter parameters tuned to 2000Hz by default
 }

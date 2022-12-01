@@ -3,10 +3,12 @@
 //========================================================================================================================//
 
 //Uncomment only one receiver type
-#define USE_PWM_RX
+//#define USE_PWM_RX
 //#define USE_PPM_RX
 //#define USE_SBUS_RX
 //#define USE_DSM_RX
+#define headless
+
 
 #include <Arduino.h>
 #include <radiosetup.h>
@@ -186,10 +188,12 @@ void radioSetup(int ch1Pin, int ch2Pin, int ch3Pin, int ch4Pin, int ch5Pin, int 
   //SBUS Recevier 
   #elif defined USE_SBUS_RX
     sbus.begin();
-
   //DSM receiver
   #elif defined USE_DSM_RX
     Serial3.begin(115000);
+  #elif defined headless
+    // not much to do
+    delay(50);
   #else
     #error No RX type defined...
   #endif
